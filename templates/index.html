@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading App</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+</head>
+<body>
+    <h1>Trading App</h1>
+    <div>
+        <h2>Precios</h2>
+        <select id="crypto">
+            <option value="bitcoin">BTC</option>
+            <option value="ethereum">ETH</option>
+            <option value="binancecoin">BNB</option>
+            <option value="solana">SOL</option>
+        </select>
+        <select id="currency">
+            <option value="usd">USD</option>
+            <option value="ars">ARS</option>
+        </select>
+        <p id="price"></p>
+    </div>
+    <div>
+        <h2>Registrar Operación</h2>
+        <form id="operation-form">
+            <input type="date" id="fecha" required>
+            <select id="tipo">
+                <option value="compra">Compra</option>
+                <option value="venta">Venta</option>
+            </select>
+            <input type="number" id="monto" step="0.000000000000000001" required placeholder="Monto">
+            <input type="number" id="comision" step="0.000000000000000001" required placeholder="Comisión">
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+    <div>
+        <h2>Configurar Binance API</h2>
+        <form id="binance-api-form">
+            <input type="text" id="api-key" placeholder="Clave API" required>
+            <input type="text" id="api-secret" placeholder="Secreto API" required>
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+    <div>
+        <h2>Operaciones Automáticas</h2>
+        <button id="toggle-auto">Activar Automatización</button>
+    </div>
+    <div>
+        <h2>Gráfico de Ganancias/Pérdidas</h2>
+        <canvas id="profitChart"></canvas>
+        <select id="time-range">
+            <option value="7">Últimos 7 días</option>
+            <option value="30">Últimos 30 días</option>
+            <option value="all">Todo</option>
+        </select>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/service-worker.js");
+        }
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            let deferredPrompt = e;
+            let installBtn = document.createElement("button");
+            installBtn.innerText = "Instalar como app";
+            installBtn.addEventListener("click", () => {
+                deferredPrompt.prompt();
+            });
+            document.body.appendChild(installBtn);
+        });
+    </script>
+</body>
+</html>
