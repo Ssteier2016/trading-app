@@ -1,0 +1,221 @@
+:root {
+    --bg: #0b0e14;
+    --card-bg: #161a25;
+    --border: #262b38;
+    --text: #eaecef;
+    --text-dim: #848e9c;
+    --green: #0ecb81;
+    --red: #f6465d;
+    --accent: #f0b90b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.page {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+}
+
+.page-header h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+}
+
+.subtitle {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin: 0 0 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 18px 14px;
+}
+
+.card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.symbol-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.side-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: var(--green);
+    color: #05130d;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+}
+.side-badge.short {
+    background: var(--red);
+    color: #200507;
+}
+
+.symbol-input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 19px;
+    font-weight: 700;
+    width: 130px;
+    padding: 2px 4px;
+    border-radius: 6px;
+}
+.symbol-input:focus { outline: 1px solid var(--accent); background: #1e2330; }
+
+.contract-label {
+    background: #1e2330;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: 120px;
+}
+.contract-label:focus { outline: 1px solid var(--accent); color: var(--text); }
+
+.menu-dots {
+    color: var(--text-dim);
+    font-size: 18px;
+    padding: 0 4px;
+}
+
+.tags-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #1e2330;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+    display: inline-flex;
+    align-items: center;
+}
+
+.leverage-tag input {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    width: 28px;
+    font-size: 12px;
+    padding: 0;
+    text-align: right;
+}
+.leverage-tag input:focus { outline: none; color: var(--text); }
+
+.live-tag {
+    color: var(--green);
+}
+
+.pnl-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 18px;
+}
+
+.field-label {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.pnl-value {
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.roi-block { text-align: right; }
+
+.roi-value {
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+.neutral { color: var(--text); }
+
+.fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+    margin-top: 20px;
+}
+
+.field label {
+    display: block;
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-bottom: 4px;
+    border-bottom: 1px dotted var(--border);
+    width: max-content;
+}
+
+.field input {
+    width: 100%;
+    background: #1e2330;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 15px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+}
+.field input:focus { outline: 1px solid var(--accent); }
+
+.mark-price, .liq-price {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 7px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.liq-price { color: var(--red); }
+
+.status-line {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    min-height: 14px;
+}
+
+.disclaimer {
+    color: var(--text-dim);
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 16px;
+}
