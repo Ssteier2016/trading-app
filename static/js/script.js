@@ -3,7 +3,6 @@ const QUOTE_SUFFIXES = ["USDT", "FDUSD", "BUSD", "USDC", "USD"];
 const els = {
     sideBadge: document.getElementById("side-badge"),
     symbolInput: document.getElementById("symbol-input"),
-    contractLabel: document.getElementById("contract-label"),
     leverageInput: document.getElementById("leverage-input"),
     liveIndicator: document.getElementById("live-indicator"),
     pnlUnit: document.getElementById("pnl-unit"),
@@ -22,6 +21,9 @@ const state = {
     side: "long",
     markPrice: null,
     pollHandle: null,
+    marginTouched: false,
+    resetEntryOnNextFetch: false,
+    lastPolledSymbol: null,
 };
 
 function baseAsset(symbol) {
@@ -49,6 +51,13 @@ function priceDecimals(price) {
     return 6;
 }
 
+function coinDecimals(value) {
+    if (!Number.isFinite(value) || value === 0) return 4;
+    if (value >= 100) return 2;
+    if (value >= 1) return 4;
+    return 6;
+}
+
 function setSign(el, value) {
     el.classList.remove("positive", "negative", "neutral");
     if (value > 0) el.classList.add("positive");
@@ -59,7 +68,6 @@ function setSign(el, value) {
 function recalculate() {
     const entry = parseFloat(els.entryInput.value);
     const qty = parseFloat(els.qtyInput.value);
-    const margin = parseFloat(els.marginInput.value);
     const leverage = parseFloat(els.leverageInput.value);
     const mark = state.markPrice;
 
@@ -73,6 +81,13 @@ function recalculate() {
         els.markPrice.textContent = "—";
     }
 
+    // Margin auto-follows quantity/entry/leverage until the user edits it by hand.
+    if (!state.marginTouched && Number.isFinite(entry) && Number.isFinite(qty) && Number.isFinite(leverage) && leverage > 0) {
+        const autoMargin = (qty * entry) / leverage;
+        els.marginInput.value = autoMargin.toFixed(coinDecimals(autoMargin));
+    }
+    const margin = parseFloat(els.marginInput.value);
+
     if (!Number.isFinite(entry) || !Number.isFinite(qty) || !Number.isFinite(mark)) {
         els.pnlValue.textContent = "—";
         els.roiValue.textContent = "—";
@@ -82,7 +97,7 @@ function recalculate() {
 
     const direction = state.side === "long" ? 1 : -1;
     const pnl = (mark - entry) * qty * direction;
-    els.pnlValue.textContent = formatNumber(pnl, 4);
+    els.pnlValue.textContent = formatNumber(pnl, coinDecimals(Math.abs(pnl)));
     setSign(els.pnlValue, pnl);
 
     if (Number.isFinite(margin) && margin > 0) {
@@ -94,8 +109,9 @@ function recalculate() {
         els.roiValue.classList.remove("positive", "negative", "neutral");
     }
 
-    if (Number.isFinite(leverage) && leverage > 0) {
-        const distance = entry / leverage;
+    // Isolated margin: liquidates once the unrealized loss consumes the allocated margin.
+    if (Number.isFinite(margin) && margin > 0 && qty > 0) {
+        const distance = margin / qty;
         const liq = state.side === "long" ? entry - distance : entry + distance;
         els.liqPrice.textContent = formatNumber(Math.max(liq, 0), priceDecimals(liq));
     } else {
@@ -121,6 +137,12 @@ async function fetchMarkPrice() {
         els.liveIndicator.textContent = "● en vivo";
         els.liveIndicator.style.color = "var(--green)";
         setStatus(`Última actualización: ${new Date().toLocaleTimeString("es-AR")}`);
+
+        if (state.resetEntryOnNextFetch) {
+            els.entryInput.value = state.markPrice.toFixed(priceDecimals(state.markPrice));
+            state.marginTouched = false;
+            state.resetEntryOnNextFetch = false;
+        }
     } catch (err) {
         state.markPrice = null;
         els.liveIndicator.textContent = "● sin datos";
@@ -136,6 +158,14 @@ function restartPolling() {
     state.pollHandle = setInterval(fetchMarkPrice, 5000);
 }
 
+function handleSymbolCommit() {
+    const symbol = els.symbolInput.value.trim().toUpperCase();
+    if (!symbol || symbol === state.lastPolledSymbol) return;
+    state.lastPolledSymbol = symbol;
+    state.resetEntryOnNextFetch = true;
+    restartPolling();
+}
+
 els.sideBadge.addEventListener("click", () => {
     state.side = state.side === "long" ? "short" : "long";
     els.sideBadge.textContent = state.side === "long" ? "B" : "S";
@@ -143,11 +173,17 @@ els.sideBadge.addEventListener("click", () => {
     recalculate();
 });
 
-els.symbolInput.addEventListener("change", restartPolling);
-els.symbolInput.addEventListener("blur", restartPolling);
+els.symbolInput.addEventListener("change", handleSymbolCommit);
+els.symbolInput.addEventListener("blur", handleSymbolCommit);
 
-[els.leverageInput, els.qtyInput, els.marginInput, els.entryInput].forEach((el) => {
+els.marginInput.addEventListener("input", () => {
+    state.marginTouched = true;
+    recalculate();
+});
+
+[els.leverageInput, els.qtyInput, els.entryInput].forEach((el) => {
     el.addEventListener("input", recalculate);
 });
 
+state.lastPolledSymbol = els.symbolInput.value.trim().toUpperCase();
 restartPolling();
